@@ -3,3 +3,5 @@ databaseChangeLog:
       file: db/changelog/001-create-categoria-servico.yaml
   - include:
       file: db/changelog/002-create-ordem-servico.yaml
+  - include:
+      file: db/changelog/003-create-estrutura-saas.yaml

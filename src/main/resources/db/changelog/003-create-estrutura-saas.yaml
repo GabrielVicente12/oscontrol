@@ -1,0 +1,216 @@
+databaseChangeLog:
+  - changeSet:
+      id: 003-01-create-empresa
+      author: oscontrol
+      changes:
+        - createTable:
+            tableName: empresa
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_empresa
+                    nullable: false
+              - column:
+                  name: nome
+                  type: VARCHAR(150)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: status
+                  type: VARCHAR(20)
+                  constraints:
+                    nullable: false
+        - sql:
+            sql: ALTER TABLE empresa ADD CONSTRAINT ck_empresa_status CHECK (status IN ('ATIVO', 'INATIVO'))
+      rollback:
+        - dropTable:
+            tableName: empresa
+
+  - changeSet:
+      id: 003-02-create-usuario
+      author: oscontrol
+      changes:
+        - createTable:
+            tableName: usuario
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_usuario
+                    nullable: false
+              - column:
+                  name: empresa_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: nome
+                  type: VARCHAR(120)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: email
+                  type: VARCHAR(180)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: senha_hash
+                  type: VARCHAR(100)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: papel
+                  type: VARCHAR(20)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: status
+                  type: VARCHAR(20)
+                  constraints:
+                    nullable: false
+        - addUniqueConstraint:
+            tableName: usuario
+            columnNames: email
+            constraintName: uk_usuario_email
+        - addForeignKeyConstraint:
+            baseTableName: usuario
+            baseColumnNames: empresa_id
+            referencedTableName: empresa
+            referencedColumnNames: id
+            constraintName: fk_usuario_empresa
+            onDelete: RESTRICT
+        - sql:
+            sql: ALTER TABLE usuario ADD CONSTRAINT ck_usuario_papel CHECK (papel IN ('ADMIN', 'GESTOR', 'TECNICO'))
+        - sql:
+            sql: ALTER TABLE usuario ADD CONSTRAINT ck_usuario_status CHECK (status IN ('ATIVO', 'INATIVO'))
+      rollback:
+        - dropTable:
+            tableName: usuario
+
+  - changeSet:
+      id: 003-03-create-frota
+      author: oscontrol
+      changes:
+        - createTable:
+            tableName: frota
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_frota
+                    nullable: false
+              - column:
+                  name: empresa_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: nome
+                  type: VARCHAR(120)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: descricao
+                  type: VARCHAR(500)
+              - column:
+                  name: status
+                  type: VARCHAR(20)
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseTableName: frota
+            baseColumnNames: empresa_id
+            referencedTableName: empresa
+            referencedColumnNames: id
+            constraintName: fk_frota_empresa
+            onDelete: RESTRICT
+        - sql:
+            sql: ALTER TABLE frota ADD CONSTRAINT ck_frota_status CHECK (status IN ('ATIVO', 'INATIVO'))
+      rollback:
+        - dropTable:
+            tableName: frota
+
+  - changeSet:
+      id: 003-04-create-ativo
+      author: oscontrol
+      changes:
+        - createTable:
+            tableName: ativo
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_ativo
+                    nullable: false
+              - column:
+                  name: empresa_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: frota_id
+                  type: BIGINT
+              - column:
+                  name: codigo
+                  type: VARCHAR(60)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: descricao
+                  type: VARCHAR(180)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: tipo
+                  type: VARCHAR(20)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: placa
+                  type: VARCHAR(20)
+              - column:
+                  name: patrimonio
+                  type: VARCHAR(60)
+              - column:
+                  name: status
+                  type: VARCHAR(20)
+                  constraints:
+                    nullable: false
+        - addUniqueConstraint:
+            tableName: ativo
+            columnNames: empresa_id,codigo
+            constraintName: uk_ativo_empresa_codigo
+        - addForeignKeyConstraint:
+            baseTableName: ativo
+            baseColumnNames: empresa_id
+            referencedTableName: empresa
+            referencedColumnNames: id
+            constraintName: fk_ativo_empresa
+            onDelete: RESTRICT
+        - addForeignKeyConstraint:
+            baseTableName: ativo
+            baseColumnNames: frota_id
+            referencedTableName: frota
+            referencedColumnNames: id
+            constraintName: fk_ativo_frota
+            onDelete: RESTRICT
+        - sql:
+            sql: ALTER TABLE ativo ADD CONSTRAINT ck_ativo_tipo CHECK (tipo IN ('VEICULO', 'MAQUINA', 'EQUIPAMENTO'))
+        - sql:
+            sql: ALTER TABLE ativo ADD CONSTRAINT ck_ativo_status CHECK (status IN ('ATIVO', 'INATIVO'))
+      rollback:
+        - dropTable:
+            tableName: ativo

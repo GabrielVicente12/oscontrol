@@ -44,12 +44,12 @@ class PersistenciaJpaTest {
 
     @Test
     @Transactional
-    void deveRegistrarOitoChangeSetsDoLiquibase() {
+    void deveRegistrarDozeChangeSetsDoLiquibase() {
         Number quantidade = (Number) entityManager.createNativeQuery(
                         "SELECT COUNT(*) FROM databasechangelog")
                 .getSingleResult();
 
-        assertEquals(8L, quantidade.longValue());
+        assertEquals(12L, quantidade.longValue());
     }
 
     @Test
