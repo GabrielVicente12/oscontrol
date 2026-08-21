@@ -1,14 +1,40 @@
 package com.ops.oscontrol.domain;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+@Entity
+@Table(name = "categoria_servico")
 public class CategoriaServico {
 
-    private final String nome;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false, length = 120)
+    private String nome;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
     private StatusCadastro status;
-    private final List<OrdemServico> ordensServico = new ArrayList<>();
+
+    @OneToMany(mappedBy = "categoriaServico", fetch = FetchType.LAZY)
+    private List<OrdemServico> ordensServico = new ArrayList<>();
+
+    protected CategoriaServico() {
+    }
 
     public CategoriaServico(String nome) {
         this.nome = validarTextoObrigatorio(nome, "Nome da categoria é obrigatório");
@@ -43,6 +69,10 @@ public class CategoriaServico {
 
     public String getNome() {
         return nome;
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public StatusCadastro getStatus() {
